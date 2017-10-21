@@ -5,7 +5,16 @@ public enum StateID
 {
     NullStateID = 0, // Non existing state
     IdleID = 1,
-    RouteRunningID = 2
+    RouteRunningID = 2,
+    RunForEndZoneID = 3,
+    Celebration = 4,
+    RunToBallCarrierID = 5,
+    TackledID = 6,
+    TacklingID = 7,
+    RunBlockingID = 8,
+    RunBlockingRouteID = 9,
+    BlockID = 10,
+    DefensiveRouteRunning = 11
 }
 
 public abstract class State

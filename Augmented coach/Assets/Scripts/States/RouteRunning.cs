@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class RouteRunning : State {
 
-    Rusher player;
+    GameObject player;
+    Route route;
     Rigidbody rb;
     float acc;
     float rotationSpeed;
     int currentWaypoint = 0;
 
-    public RouteRunning(Rusher p)
+    public RouteRunning(GameObject p)
     {
         player = p;
         acc = player.GetComponent<PlayerStats>() != null 
@@ -24,6 +25,11 @@ public class RouteRunning : State {
         {
             Debug.LogError("There is no rigidbody attached to the object you try to set in RouteRunnging state. GameObject: " + p.name);
         }
+        route = player.GetComponent<Route>();
+        if(route == null)
+        {
+            Debug.LogError("There is no Route component attached the gameobject in RouteRunning state. GameObject: " + p.name);
+        }
         id = StateID.RouteRunningID;
     }
 
@@ -34,41 +40,54 @@ public class RouteRunning : State {
 
     public override void Execute()
     {
-        if(currentWaypoint < player.route.Length)
+        if(currentWaypoint < route.route.Length)
         {
-            var nextWaypoint = player.route[currentWaypoint];
+            var nextWaypoint = route.route[currentWaypoint];
+            // Check if already infront of next waypoint
+            var ezToWp = nextWaypoint.position - ObjectManager.Instance.endZone.transform.position;
+            var ezToPlayer = player.transform.position - ObjectManager.Instance.endZone.transform.position;
+            if ((new Vector3(0f, 0f, ezToWp.z).magnitude > new Vector3(0f, 0f, ezToPlayer.z).magnitude))
+            {
+                currentWaypoint++;
+            }
+        }
+        // Run route
+        if (currentWaypoint < route.route.Length)
+        {
+            var nextWaypoint = route.route[currentWaypoint];
             nextWaypoint.transform.position = new Vector3(
                 nextWaypoint.transform.position.x,
                 player.transform.position.y,
                 nextWaypoint.transform.position.z
-                );
+            );
             var vecToWaypoint = nextWaypoint.position - player.transform.position;
             var distanceToWaypoint = vecToWaypoint.magnitude;
             if(distanceToWaypoint < 4f)
             {
                 currentWaypoint++;
             }
-            var rot = RotationCalculator.RotateTowardsPoint(player.transform, 
+            var rot = Helper.RotateTowardsPoint(player.transform, 
                 nextWaypoint.position, 
                 player.transform.forward, 
                 player.transform.rotation, 
                 rotationSpeed);
             rb.MoveRotation(rot);
-        } else
-        {
-            // Rotate towards end zone
-            var rot = RotationCalculator.RotateTowardsPoint(player.transform,
-                player.transform.position + (Vector3.forward * 10f),
-                player.transform.forward,
-                player.transform.rotation,
-                rotationSpeed);
-            rb.MoveRotation(rot);
         }
-        rb.velocity += player.transform.forward * acc * Time.deltaTime;
+        var dir = player.transform.forward;
+        // Avoid defence players
+        dir += Helper.CalculateAvoidanceVector(player.transform, Player.Side.Defence, 20f, 0.5f);
+        dir += Helper.CalculateAvoidanceVector(player.transform, Player.Side.Offense, 10f, 0.25f);
+        
+        dir += Helper.CalculateSidelineAvoidance(player.transform.position, 3f, 5f);
+        rb.velocity += dir.normalized * acc * Time.deltaTime;
     }
 
     public override StateID Reason()
     {
+        if(currentWaypoint >= route.route.Length)
+        {
+            return StateID.RunForEndZoneID;
+        }
         return base.Reason();
     }
 

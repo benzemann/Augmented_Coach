@@ -1,23 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-[RequireComponent(typeof(PlayerStats)), RequireComponent(typeof(Rigidbody))]
-public class Rusher : MonoBehaviour {
+[RequireComponent(typeof(PlayerStats)), RequireComponent(typeof(Rigidbody)), RequireComponent(typeof(Route))]
+public class Rusher : Player {
 
-    public Transform[] route;
-    FSM fsm;
-    PlayerStats stats;
-    Rigidbody rb;
-    // For debugging
-    [SerializeField]
-    StateID currentState;
-
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    protected override void Init () {
         InitFsm();
-        stats = GetComponent<PlayerStats>();
-        rb = GetComponent<Rigidbody>();
-	}
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -26,26 +16,40 @@ public class Rusher : MonoBehaviour {
         
 	}
 
-    void RestrictSpeed()
-    {
-        if (rb.velocity.magnitude > (stats.speed * Time.deltaTime))
-        {
-            rb.velocity = rb.velocity.normalized * stats.speed * Time.deltaTime;
-        }
-        Debug.Log(rb.velocity.magnitude);
-    }
 
     void InitFsm()
     {
         fsm = new FSM();
         // Adding states to the fsm
         fsm.AddState(new Idle());
-        fsm.AddState(new RouteRunning(this));
+        fsm.AddState(new RouteRunning(this.gameObject));
+        fsm.AddState(new RunForEndZone(this.gameObject));
+        fsm.AddState(new Celebration(this.gameObject));
+        fsm.AddState(new Tackled(this.gameObject));
     }
 
-    void UpdateFsm()
+    private void OnTriggerEnter(Collider other)
     {
-        fsm.UpdateState();
-        currentState = fsm.CurrentStateID;
+        if (other.gameObject == ObjectManager.Instance.endZone)
+        {
+            fsm.ChangeState(StateID.Celebration);
+        }
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject == ObjectManager.Instance.endZone)
+        {
+            fsm.ChangeState(StateID.Celebration);
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.white;
+        //Gizmos.DrawWireSphere(transform.position, 40f);
+       // var avoidanceVec = Helper.CalculateSidelineAvoidance(this.transform.position, 7f, 1f);
+        //Gizmos.DrawLine(this.transform.position, this.transform.position + rb.velocity.normalized * 5f);
+        //Gizmos.color = Color.blue;
+        //Gizmos.DrawLine(this.transform.position, this.transform.position + avoidanceVec.normalized * 5f);
     }
 }
