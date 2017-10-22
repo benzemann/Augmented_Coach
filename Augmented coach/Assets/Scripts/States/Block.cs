@@ -35,6 +35,7 @@ public class Block : State {
     {
         
         var vecToTarget = target.transform.position - player.transform.position;
+        // If far away run forward player, else run towards
         if(vecToTarget.magnitude > 10f)
         {
             var rot = Helper.RotateTowardsPoint(player.transform,
@@ -52,36 +53,38 @@ public class Block : State {
                 stats.rotationSpeed);
             rb.MoveRotation(rot);
         }
-
+        // Try to block if close enough
         if (vecToTarget.magnitude < stats.blockRadius)
         {
             // Try to shove away from ball carrier
             var vecFromBallToTarget = target.transform.position - ObjectManager.Instance.ballCarrier.transform.position;
             rb.velocity *= 0.95f;
             target.GetComponent<Player>().GetBlocked(player.transform, vecFromBallToTarget.normalized, stats.strength);
-
         }
-
+        // Move forward
         var dir = player.transform.forward;
+        // Avoid sideline
         dir += Helper.CalculateSidelineAvoidance(player.transform.position, 3f, 5f);
+        // Calculate velocity
         rb.velocity += dir.normalized * stats.acceleration * Time.deltaTime;
-
-        
     }
 
     public override StateID Reason()
     {
+        // If target too far away forget about him
         if(target == null || Vector3.Distance(target.transform.position, player.transform.position) > 25f)
         {
             return StateID.RunBlockingID;
         }
+        // If target is blocked and a bit far away, forget about him
         if(target.GetComponent<Player>().isBlocked == true && 
             Vector3.Distance(target.transform.position, ObjectManager.Instance.ballCarrier.transform.position) > 10f)
         {
             return StateID.RunBlockingID;
         }
+        // Flag the target as blocked
         target.GetComponent<Player>().isBlocked = true;
-        //return StateID.RunBlockingID;
+
         return base.Reason();
     }
 

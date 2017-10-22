@@ -6,22 +6,16 @@ public class RunToBallCarrier : State {
 
     GameObject player;
     Rigidbody rb;
-    float acc;
-    float rotationSpeed;
-    float tackleRadius;
+    PlayerStats stats;
 
     public RunToBallCarrier(GameObject p)
     {
         player = p;
-        acc = player.GetComponent<PlayerStats>() != null
-            ? player.GetComponent<PlayerStats>().acceleration
-            : 0;
-        rotationSpeed = player.GetComponent<PlayerStats>() != null
-            ? player.GetComponent<PlayerStats>().rotationSpeed
-            : 0;
-        tackleRadius = player.GetComponent<PlayerStats>() != null
-            ? player.GetComponent<PlayerStats>().tackleRadius
-            : 0;
+        stats = player.GetComponent<PlayerStats>();
+        if (stats == null)
+        {
+            Debug.LogError("There is no PlayerStats attached to the object you try to set in RunToBallCarrier state. GameObject: " + p.name);
+        }
         rb = player.GetComponent<Rigidbody>();
         if (rb == null)
         {
@@ -41,6 +35,7 @@ public class RunToBallCarrier : State {
         {
             var vecToBallCarrier = ObjectManager.Instance.ballCarrier.transform.position - player.transform.position;
             var distance = vecToBallCarrier.magnitude;
+            // Calcualte position to run towards. If far away run forward ball carrier to catch up
             var targetPos = ObjectManager.Instance.ballCarrier.transform.position +
                     ObjectManager.Instance.ballCarrier.transform.forward * 14f;
             if (distance > 30f)
@@ -59,10 +54,10 @@ public class RunToBallCarrier : State {
                 targetPos,
                 player.transform.forward,
                 player.transform.rotation,
-                rotationSpeed);
+                stats.rotationSpeed);
             rb.MoveRotation(rot);
-
-            rb.velocity += player.transform.forward * acc * Time.deltaTime;
+            // Calculate velocity
+            rb.velocity += player.transform.forward * stats.acceleration * Time.deltaTime;
         }
     }
 
@@ -70,8 +65,8 @@ public class RunToBallCarrier : State {
     {
         var distance = (ObjectManager.Instance.ballCarrier.transform.position -
             player.transform.position).magnitude;
-
-        if(distance < tackleRadius)
+        // Tackle player if close enough
+        if(distance < stats.tackleRadius)
         {
             player.GetComponent<Player>().Tackle(ObjectManager.Instance.ballCarrier.GetComponent<Player>());
             return StateID.TacklingID;

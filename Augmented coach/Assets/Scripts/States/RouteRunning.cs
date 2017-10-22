@@ -7,23 +7,22 @@ public class RouteRunning : State {
     GameObject player;
     Route route;
     Rigidbody rb;
-    float acc;
-    float rotationSpeed;
+    PlayerStats stats;
     int currentWaypoint = 0;
 
     public RouteRunning(GameObject p)
     {
+        // Get components
         player = p;
-        acc = player.GetComponent<PlayerStats>() != null 
-            ? player.GetComponent<PlayerStats>().acceleration 
-            : 0;
-        rotationSpeed = player.GetComponent<PlayerStats>() != null
-            ? player.GetComponent<PlayerStats>().rotationSpeed
-            : 0;
         rb = player.GetComponent<Rigidbody>();
         if (rb == null)
         {
             Debug.LogError("There is no rigidbody attached to the object you try to set in RouteRunnging state. GameObject: " + p.name);
+        }
+        stats = player.GetComponent<PlayerStats>();
+        if(stats == null)
+        {
+            Debug.LogError("There is no PlayerStats component attached to the object you try to set in RouteRunning state. GameObject: " + p.name);
         }
         route = player.GetComponent<Route>();
         if(route == null)
@@ -40,46 +39,27 @@ public class RouteRunning : State {
 
     public override void Execute()
     {
-        if(currentWaypoint < route.route.Length)
-        {
-            var nextWaypoint = route.route[currentWaypoint];
-            // Check if already infront of next waypoint
-            var ezToWp = nextWaypoint.position - ObjectManager.Instance.endZone.transform.position;
-            var ezToPlayer = player.transform.position - ObjectManager.Instance.endZone.transform.position;
-            if ((new Vector3(0f, 0f, ezToWp.z).magnitude > new Vector3(0f, 0f, ezToPlayer.z).magnitude))
-            {
-                currentWaypoint++;
-            }
-        }
-        // Run route
+        // Check if already infront of next waypoint
         if (currentWaypoint < route.route.Length)
         {
             var nextWaypoint = route.route[currentWaypoint];
-            nextWaypoint.transform.position = new Vector3(
-                nextWaypoint.transform.position.x,
-                player.transform.position.y,
-                nextWaypoint.transform.position.z
-            );
-            var vecToWaypoint = nextWaypoint.position - player.transform.position;
-            var distanceToWaypoint = vecToWaypoint.magnitude;
-            if(distanceToWaypoint < 4f)
+            if (Helper.DistanceToEndZone(nextWaypoint.position, Player.Side.Offense) > 
+                Helper.DistanceToEndZone(player.transform.position, Player.Side.Offense))
             {
                 currentWaypoint++;
             }
-            var rot = Helper.RotateTowardsPoint(player.transform, 
-                nextWaypoint.position, 
-                player.transform.forward, 
-                player.transform.rotation, 
-                rotationSpeed);
-            rb.MoveRotation(rot);
         }
+        // Rotate towards next waypoint in route
+        player.GetComponent<Player>().RotateTowardsNextWaypointInRoute(route, ref currentWaypoint);
         var dir = player.transform.forward;
         // Avoid defence players
         dir += Helper.CalculateAvoidanceVector(player.transform, Player.Side.Defence, 20f, 0.5f);
+        // Avoid offense players
         dir += Helper.CalculateAvoidanceVector(player.transform, Player.Side.Offense, 10f, 0.25f);
-        
+        // Avoid sideline
         dir += Helper.CalculateSidelineAvoidance(player.transform.position, 3f, 5f);
-        rb.velocity += dir.normalized * acc * Time.deltaTime;
+        // Calculate and add to velocity
+        rb.velocity += dir.normalized * stats.acceleration * Time.deltaTime;
     }
 
     public override StateID Reason()

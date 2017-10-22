@@ -21,11 +21,11 @@ public class Celebration : State {
 
     public override void Enter()
     {
-        if(ObjectManager.Instance.endZone == null)
+        if(ObjectManager.Instance.endZoneOffense == null) // TODO: Should check side
         {
             Debug.LogError("There are no endzone assigned in the objectmanager!");
         }
-        endZone = ObjectManager.Instance.endZone.transform;
+        endZone = ObjectManager.Instance.endZoneOffense.transform;
     }
 
     public override void Execute()

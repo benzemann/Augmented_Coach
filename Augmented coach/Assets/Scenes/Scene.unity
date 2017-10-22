@@ -1070,7 +1070,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 503234119}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.3, y: 3.1, z: 8.6}
+  m_LocalPosition: {x: -51, y: 3.1, z: 48.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1502450954}
@@ -1545,7 +1545,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 798101570}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -34.7, y: 3.1, z: 11.8}
+  m_LocalPosition: {x: -60.7, y: 3.1, z: 39.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1502450954}
@@ -1713,7 +1713,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 917445122}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -38.1, y: 3.1, z: 12.2}
+  m_LocalPosition: {x: -16.8, y: 3.1, z: 33.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1502450954}
@@ -2033,7 +2033,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1556d607ce83754eafb86662966dd96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  endZone: {fileID: 640137951}
+  endZoneOffense: {fileID: 640137951}
+  endZoneDefence: {fileID: 0}
   ballCarrier: {fileID: 1114147965}
   sidelineMarker1: {fileID: 1694130828}
   sidelineMarker2: {fileID: 1064669961}
@@ -2672,7 +2673,7 @@ MonoBehaviour:
   rotationSpeed: 15
   tackleRadius: 0
   strength: 10
-  blockRadius: 7
+  blockRadius: 10
 --- !u!54 &1137741985
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3743,8 +3744,8 @@ MonoBehaviour:
   acceleration: 150
   speed: 1500
   rotationSpeed: 25
-  tackleRadius: 7
-  strength: 7
+  tackleRadius: 5
+  strength: 5
   blockRadius: 0
 --- !u!54 &1833732318
 Rigidbody:
