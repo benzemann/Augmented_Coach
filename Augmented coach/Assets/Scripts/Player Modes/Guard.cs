@@ -23,11 +23,17 @@ public class Guard : Player {
     {
         fsm = new FSM();
         // Adding states to the fsm
-        //fsm.AddState(new Idle());
+        fsm.AddState(new Idle());
         fsm.AddState(new RunBlockingRoute(this.gameObject));
         fsm.AddState(new RunBlocking(this.gameObject));
         fsm.AddState(new Block(this.gameObject));
         
+    }
+
+    public override void Snap()
+    {
+        fsm.ChangeState(StateID.RunBlockingRouteID);
+        base.Snap();
     }
 
 }

@@ -13,6 +13,15 @@ public class ObjectManager : Singleton<ObjectManager> {
     public GameObject[] DefencePlayers { get { return defencePlayers.ToArray(); } }
     List<GameObject> offensePlayers;
     public GameObject[] OffensePlayers { get { return offensePlayers.ToArray(); } }
+    public GameObject[] AllPlayers {
+        get
+        {
+            var allPlayers = new List<GameObject>();
+            allPlayers.AddRange(defencePlayers);
+            allPlayers.AddRange(offensePlayers);
+            return allPlayers.ToArray();
+        }
+    }
     
     // Use this for initialization
     void Awake () {

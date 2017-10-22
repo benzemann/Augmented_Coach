@@ -27,6 +27,12 @@ public class Rusher : Player {
         fsm.AddState(new Tackled(this.gameObject));
     }
 
+    public override void Snap()
+    {
+        fsm.ChangeState(StateID.RouteRunningID);
+        base.Snap();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         // Change state to celebration when hitting end zone

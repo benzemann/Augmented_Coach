@@ -13,7 +13,7 @@ public class Player : MonoBehaviour {
     
     [HideInInspector]
     public GameObject target;
-    [HideInInspector]
+    //[HideInInspector]
     public bool isBlocked;
 
     [Tooltip("The side of the player. Defence or offense.")]
@@ -43,6 +43,17 @@ public class Player : MonoBehaviour {
         // Call init function. 
         Init();
 
+    }
+
+    public virtual void Snap()
+    {
+        // Use this to define what will happen when the ball is snapped
+        // base.Snap() should always be called
+        var playPicker = GetComponent<PlayPicker>();
+        if(playPicker != null)
+        {
+            playPicker.HidePlayIndicator();
+        }
     }
 
     protected virtual void Init()
@@ -104,7 +115,7 @@ public class Player : MonoBehaviour {
     public void GetBlocked(Transform player, Vector3 dir, int strength)
     {
         // Calculate strenght score, positive defender wins, 0 or negative attacker wins
-        var strenghtScore = (stats.strength - strength) + Random.Range(-3, 3);
+        var strenghtScore = (stats.strength - strength) + Random.Range(-3, 4);
         if(strenghtScore > 0)
         {
             // Defender wins

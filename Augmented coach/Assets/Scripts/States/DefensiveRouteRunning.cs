@@ -38,10 +38,6 @@ public class DefensiveRouteRunning : State {
 
     public override void Execute()
     {
-        if (timeInState <= 5f) // TODO: Should not be here
-        {
-            return;
-        }
         // Run route
         player.GetComponent<Player>().RotateTowardsNextWaypointInRoute(route, ref currentWaypoint);
         // Run forward

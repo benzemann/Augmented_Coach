@@ -21,10 +21,16 @@ public class Blitzer : Player {
     {
         fsm = new FSM();
         // Adding states to the fsm
-        //fsm.AddState(new Idle());
+        fsm.AddState(new Idle());
         fsm.AddState(new DefensiveRouteRunning(this.gameObject));
         fsm.AddState(new RunToBallCarrier(this.gameObject));
         fsm.AddState(new Tackling(this.gameObject));
+    }
+
+    public override void Snap()
+    {
+        fsm.ChangeState(StateID.DefensiveRouteRunning);
+        base.Snap();
     }
 
     private void OnDrawGizmos()

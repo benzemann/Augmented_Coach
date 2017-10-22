@@ -38,10 +38,6 @@ public class RunBlockingRoute : State {
 
     public override void Execute()
     {
-        if (timeInState <= 5f)
-        {
-            return;
-        }
         // Rotate towards next waypoint
         player.GetComponent<Player>().RotateTowardsNextWaypointInRoute(route, ref currentWaypoint);
         // Move forward
@@ -59,7 +55,7 @@ public class RunBlockingRoute : State {
         {
             return StateID.RunBlockingID;
         }
-        GameObject closestPlayer = Helper.GetClosestPlayer(player.transform.position, Player.Side.Defence, 15f, true);
+        GameObject closestPlayer = Helper.GetClosestPlayer(player.transform.position, Player.Side.Defence, 10f);
         // Close unblocked player, block him
         if (closestPlayer != null)
         {

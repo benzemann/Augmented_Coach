@@ -21,11 +21,6 @@ public class Idle : State {
 
     public override StateID Reason()
     {
-        if(timeInState > 5f)
-        {
-            return StateID.RouteRunningID;
-
-        }
         return base.Reason();
     }
 
