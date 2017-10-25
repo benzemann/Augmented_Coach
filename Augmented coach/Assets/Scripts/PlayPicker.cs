@@ -10,7 +10,8 @@ public class PlayPicker : MonoBehaviour {
     [SerializeField]
     GameObject[] plays;
     GameObject currentplay;
-
+    public Transform reference;
+    public Transform field;
 	// Use this for initialization
 	void Start () {
         // Start with a random play
@@ -32,7 +33,13 @@ public class PlayPicker : MonoBehaviour {
         {
             Destroy(currentplay);
         }
-        currentplay = Instantiate(plays[number], new Vector3(this.transform.position.x, 0.02f, this.transform.position.z), Quaternion.identity) as GameObject;
+        currentplay = Instantiate(plays[number], Vector3.zero, Quaternion.identity) as GameObject;
+        if(this.transform.parent != null)
+        {
+            currentplay.transform.SetParent(this.transform.parent);
+        }
+        currentplay.transform.localPosition = new Vector3(this.transform.localPosition.x, -0.0365f, this.transform.localPosition.z);
+        currentplay.transform.localRotation = this.transform.localRotation;
         playNumber = number;
         AssignRoute(currentplay);
     }
@@ -55,7 +62,8 @@ public class PlayPicker : MonoBehaviour {
 
     public void HidePlayIndicator()
     {
-        for(int i = 1; i < currentplay.transform.childCount; i++)
+        currentplay.transform.SetParent(field);
+        for (int i = 1; i < currentplay.transform.childCount; i++)
         {
             currentplay.transform.GetChild(i).GetComponent<Renderer>().enabled = false;
         }

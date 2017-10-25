@@ -23,7 +23,12 @@ public class GameMng : Singleton<GameMng> {
         var allPlayers = ObjectManager.Instance.AllPlayers;
         for(int i = 0; i < allPlayers.Length; i++)
         {
+            if (allPlayers[i].GetComponent<ReattachParent>() != null)
+            {
+                allPlayers[i].GetComponent<ReattachParent>().Snap();
+            }
             allPlayers[i].GetComponent<Player>().Snap();
+            
         }
     }
 }
